@@ -1,3 +1,4 @@
+#include "std.h"
 #include "preprocessor.h"
 #include "ex.h"
 #include "toker.h"

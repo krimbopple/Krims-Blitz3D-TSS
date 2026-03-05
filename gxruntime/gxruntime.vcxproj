@@ -62,7 +62,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <StringPooling>true</StringPooling>
-      <PreprocessorDefinitions>WIN32;NDEBUG;PRO;_LIB;_HAS_STD_BYTE=0;_NO_DEBUG_HEAP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_HAS_STD_BYTE=0;NDEBUG;PRO;_LIB;_HAS_STD_BYTE=0;_NO_DEBUG_HEAP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AssemblerListingLocation>.\Release\</AssemblerListingLocation>
       <PrecompiledHeaderOutputFile>.\Release\gxruntime.pch</PrecompiledHeaderOutputFile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
@@ -113,7 +113,7 @@
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <WarningLevel>TurnOffAllWarnings</WarningLevel>
       <MinimalRebuild>false</MinimalRebuild>
-      <PreprocessorDefinitions>WIN32;_DEBUG;PRO;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_HAS_STD_BYTE=0;_DEBUG;PRO;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AssemblerListingLocation>.\Debug\</AssemblerListingLocation>
       <PrecompiledHeaderOutputFile>.\Debug\gxruntime.pch</PrecompiledHeaderOutputFile>
       <PrecompiledHeader>Use</PrecompiledHeader>

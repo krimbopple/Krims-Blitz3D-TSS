@@ -14,6 +14,7 @@ _release/*.ttf
 *.aps
 *.bb_bak1
 .vs
+.idea
 */objs/*
 *.zip
 temp

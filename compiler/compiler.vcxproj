@@ -60,7 +60,7 @@
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <WarningLevel>TurnOffAllWarnings</WarningLevel>
       <MinimalRebuild>false</MinimalRebuild>
-      <PreprocessorDefinitions>WIN32;_DEBUG;PRO;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_HAS_STD_BYTE=0;_DEBUG;PRO;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AssemblerListingLocation>.\Debug\</AssemblerListingLocation>
       <PrecompiledHeaderOutputFile>.\Debug\compiler.pch</PrecompiledHeaderOutputFile>
       <PrecompiledHeader>Use</PrecompiledHeader>

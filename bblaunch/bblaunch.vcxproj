@@ -62,7 +62,7 @@
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <WarningLevel>TurnOffAllWarnings</WarningLevel>
       <MinimalRebuild>false</MinimalRebuild>
-      <PreprocessorDefinitions>WIN32;_DEBUG;PRO;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_HAS_STD_BYTE=0;_DEBUG;PRO;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AssemblerListingLocation>.\Debug\</AssemblerListingLocation>
       <PrecompiledHeaderOutputFile>.\Debug\bblaunch.pch</PrecompiledHeaderOutputFile>
       <ObjectFileName>.\Debug\</ObjectFileName>
@@ -105,7 +105,7 @@
       <Optimization>MaxSpeed</Optimization>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <WarningLevel>TurnOffAllWarnings</WarningLevel>
-      <PreprocessorDefinitions>WIN32;NDEBUG;PRO;_WINDOWS;_HAS_STD_BYTE=0;_NO_DEBUG_HEAP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_HAS_STD_BYTE=0;NDEBUG;PRO;_WINDOWS;_HAS_STD_BYTE=0;_NO_DEBUG_HEAP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AssemblerListingLocation>.\Release\</AssemblerListingLocation>
       <PrecompiledHeaderOutputFile>.\Release\bblaunch.pch</PrecompiledHeaderOutputFile>
       <ObjectFileName>.\Release\</ObjectFileName>

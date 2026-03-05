@@ -60,7 +60,7 @@
       <Optimization>MaxSpeed</Optimization>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <WarningLevel>TurnOffAllWarnings</WarningLevel>
-      <PreprocessorDefinitions>WIN32;NDEBUG;PRO;_LIB;_HAS_STD_BYTE=0;_NO_DEBUG_HEAP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_HAS_STD_BYTE=0;NDEBUG;PRO;_LIB;_HAS_STD_BYTE=0;_NO_DEBUG_HEAP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AssemblerListingLocation>.\Release\</AssemblerListingLocation>
       <PrecompiledHeaderOutputFile>.\Release\blitz3d.pch</PrecompiledHeaderOutputFile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
@@ -113,7 +113,7 @@
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <WarningLevel>TurnOffAllWarnings</WarningLevel>
       <MinimalRebuild>false</MinimalRebuild>
-      <PreprocessorDefinitions>WIN32;_DEBUG;PRO;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_HAS_STD_BYTE=0;_DEBUG;PRO;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AssemblerListingLocation>.\Debug\</AssemblerListingLocation>
       <PrecompiledHeaderOutputFile>.\Debug\blitz3d.pch</PrecompiledHeaderOutputFile>
       <ObjectFileName>.\Debug\</ObjectFileName>

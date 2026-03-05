@@ -91,7 +91,7 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>$(UserOptionDirectory);..\..\..\include;$(UserIncludeDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;FT_DEBUG_LEVEL_ERROR;FT_DEBUG_LEVEL_TRACE;FT2_BUILD_LIBRARY;DLL_EXPORT;$(UserDefines);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_HAS_STD_BYTE=0;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;FT_DEBUG_LEVEL_ERROR;FT_DEBUG_LEVEL_TRACE;FT2_BUILD_LIBRARY;DLL_EXPORT;$(UserDefines);%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <DisableLanguageExtensions>true</DisableLanguageExtensions>
@@ -144,7 +144,7 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>$(UserOptionDirectory);..\..\..\include;$(UserIncludeDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;FT_DEBUG_LEVEL_ERROR;FT_DEBUG_LEVEL_TRACE;FT2_BUILD_LIBRARY;$(UserDefines);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_HAS_STD_BYTE=0;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;FT_DEBUG_LEVEL_ERROR;FT_DEBUG_LEVEL_TRACE;FT2_BUILD_LIBRARY;$(UserDefines);%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <DisableLanguageExtensions>true</DisableLanguageExtensions>
@@ -198,7 +198,7 @@
       <Optimization>MaxSpeed</Optimization>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <AdditionalIncludeDirectories>$(UserOptionDirectory);..\..\..\include;$(UserIncludeDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;FT2_BUILD_LIBRARY;DLL_EXPORT;$(UserDefines);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_HAS_STD_BYTE=0;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;FT2_BUILD_LIBRARY;DLL_EXPORT;$(UserDefines);%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <DisableLanguageExtensions>true</DisableLanguageExtensions>
@@ -253,7 +253,7 @@
       <Optimization>MaxSpeed</Optimization>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <AdditionalIncludeDirectories>$(UserOptionDirectory);..\..\..\include;$(UserIncludeDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;FT2_BUILD_LIBRARY;_NO_DEBUG_HEAP=1;$(UserDefines);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_HAS_STD_BYTE=0;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;FT2_BUILD_LIBRARY;_NO_DEBUG_HEAP=1;$(UserDefines);%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FunctionLevelLinking>false</FunctionLevelLinking>
       <DisableLanguageExtensions>true</DisableLanguageExtensions>
