@@ -136,6 +136,7 @@ public:
 	unsigned getMask()const;
 	unsigned getColor()const;
 	unsigned getClsColor()const;
+	bool hasAlpha() const { return format.hasAlpha(); }
 };
 
 #endif

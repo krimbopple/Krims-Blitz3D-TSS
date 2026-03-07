@@ -488,13 +488,15 @@ ddSurf* ddUtil::loadSurface(const std::string& f, int flags, gxGraphics* gfx) {
 		}
 	}
 	else {
-		unsigned char* p = (unsigned char*)bits;
-		for(int k = 0; k < height; ++k) {
-			unsigned char* t = p + 3;
-			for(int j = 0; j < width; ++j) {
-				*t = 0xff; t += 4;
+		if (!trans) {
+			unsigned char* p = (unsigned char*)bits;
+			for (int k = 0; k < height; ++k) {
+				unsigned char* t = p + 3;
+				for (int j = 0; j < width; ++j) {
+					*t = 0xff; t += 4;
+				}
+				p += pitch;
 			}
-			p += pitch;
 		}
 	}
 

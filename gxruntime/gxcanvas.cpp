@@ -457,12 +457,62 @@ void gxCanvas::blit(int x, int y, gxCanvas* src, int src_x, int src_y, int src_w
 	if(solid) {
 		surf->Blt(&dest_r, src->surf, &src_r, DDBLT_WAIT, 0);
 	}
-	else {
-		bltfx.ddckSrcColorkey.dwColorSpaceLowValue =
-			bltfx.ddckSrcColorkey.dwColorSpaceHighValue = src->mask_surf;
-		surf->Blt(&dest_r, src->surf, &src_r, DDBLT_WAIT | DDBLT_KEYSRCOVERRIDE, &bltfx);
+	else 
+	{
+		if (src->hasAlpha()) 
+		{
+			src->lock();
+			this->lock();
+
+			int dest_pitch = locked_pitch;
+			int src_pitch = src->locked_pitch;
+			unsigned char* dest_base = locked_surf + dest_r.top * dest_pitch + dest_r.left * format.getPitch();
+			unsigned char* src_base = src->locked_surf + src_r.top * src_pitch + src_r.left * src->format.getPitch();
+
+			int width = dest_r.right - dest_r.left;
+			int height = dest_r.bottom - dest_r.top;
+			int dest_bpp = format.getPitch();
+			int src_bpp = src->format.getPitch();
+
+			for (int row = 0; row < height; ++row) {
+				unsigned char* dest_ptr = dest_base + row * dest_pitch;
+				unsigned char* src_ptr = src_base + row * src_pitch;
+				for (int col = 0; col < width; ++col) {
+					unsigned src_argb = src->format.getPixel(src_ptr);
+					unsigned src_alpha = (src_argb >> 24) & 0xff;
+					if (src_alpha == 0)
+					{
+					}
+					else if (src_alpha == 255) 
+					{
+						format.setPixel(dest_ptr, src_argb);
+					}
+					else 
+					{
+						unsigned dst_argb = format.getPixel(dest_ptr);
+						unsigned r = ((src_argb >> 16) & 0xff) * src_alpha + ((dst_argb >> 16) & 0xff) * (255 - src_alpha);
+						unsigned g = ((src_argb >> 8) & 0xff) * src_alpha + ((dst_argb >> 8) & 0xff) * (255 - src_alpha);
+						unsigned b = ((src_argb) & 0xff) * src_alpha + ((dst_argb) & 0xff) * (255 - src_alpha);
+						unsigned a = dst_argb & 0xff000000;   // keep dest alpha
+						unsigned blended = a | ((r / 255) << 16) | ((g / 255) << 8) | (b / 255);
+						format.setPixel(dest_ptr, blended);
+					}
+					src_ptr += src_bpp;
+					dest_ptr += dest_bpp;
+				}
+			}
+
+			src->unlock();
+			this->unlock();
+			damage(dest_r);
+		}
+		else 
+		{
+			bltfx.ddckSrcColorkey.dwColorSpaceLowValue = bltfx.ddckSrcColorkey.dwColorSpaceHighValue = src->mask_surf;
+			surf->Blt(&dest_r, src->surf, &src_r, DDBLT_WAIT | DDBLT_KEYSRCOVERRIDE, &bltfx);
+			damage(dest_r);
+		}
 	}
-	damage(dest_r);
 }
 
 void gxCanvas::blitstretch(int x, int y, int w, int h, gxCanvas* src, int src_x, int src_y, int src_w, int src_h, bool solid) {

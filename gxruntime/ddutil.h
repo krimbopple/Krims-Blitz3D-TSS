@@ -51,6 +51,7 @@ public:
 	}
 	void setPixel(void* p, unsigned n)const { plot(p, n); }
 	unsigned getPixel(void* p)const { return point(p); }
+	bool hasAlpha() const { return amask != 0; }
 };
 
 #endif
