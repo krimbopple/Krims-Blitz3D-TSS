@@ -813,7 +813,7 @@ void bbCloseMovie(gxMovie* movie)
 bbImage* bbLoadImage(BBStr* s)
 {
     std::string t = *s; delete s;
-    gxCanvas* c = gx_graphics->loadCanvas(t, gxCanvas::CANVAS_HIGHCOLOR);
+    gxCanvas* c = gx_graphics->loadCanvas(t, 0);
     if (!c) return 0;
     if (auto_dirty) c->backup();
     if (auto_midhandle) c->setHandle(c->getWidth() / 2, c->getHeight() / 2);
