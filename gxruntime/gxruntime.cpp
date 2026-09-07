@@ -228,9 +228,13 @@ void gxRuntime::resumeAudio() {
 }
 
 void gxRuntime::restoreGraphics() {
-	if(auto_suspend) {
-		if(!graphics->restore()) gfx_lost = true;
-		else gfx_lost = false;
+	if (!graphics) return;
+	gxGraphics::DeviceState state = graphics->getDeviceState();
+	if (state == gxGraphics::DEVICE_NEEDS_RESET || state == gxGraphics::DEVICE_LOST) {
+		gfx_lost = !graphics->restore();
+	}
+	else {
+		gfx_lost = false;
 	}
 }
 
@@ -291,9 +295,9 @@ void gxRuntime::resume() {
 // FORCE SUSPEND //
 ///////////////////
 void gxRuntime::forceSuspend() {
-	if(gfx_mode == GMODE_EXCLUSIVE) {
+	if (gfx_mode == GMODE_EXCLUSIVE) {
+		ShowWindow(hwnd, SW_MINIMIZE);
 		SetForegroundWindow(GetDesktopWindow());
-		ShowWindow(GetDesktopWindow(), SW_SHOW);
 	}
 	else {
 		suspend();
@@ -497,10 +501,6 @@ LRESULT gxRuntime::windowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 	//handle 'special' messages!
 	switch(msg) {
 		case WM_PAINT:
-			if(gfx_mode && !auto_suspend) {
-				if(!graphics->restore()) gfx_lost = true;
-				else gfx_lost = false;
-			}
 			BeginPaint(hwnd, &ps);
 			paint();
 			EndPaint(hwnd, &ps);
