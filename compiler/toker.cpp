@@ -589,6 +589,20 @@ void Toker::nextline()
             tokes.push_back(Toke(GE, from, k += 2));
             continue;
         }
+#ifdef XBETA
+        if ((c == '+' || c == '-' || c == '*' || c == '/' || c == '&') && line[k + 1] == '=') {
+            int token = 0;
+            switch (c) {
+            case '+': token = PLUSEQ; break;
+            case '-': token = MINUSEQ; break;
+            case '*': token = STAREQ; break;
+            case '/': token = SLASHEQ; break;
+            case '&': token = AMPEQ; break;
+            }
+            tokes.push_back(Toke(token, from, k += 2));
+            continue;
+        }
+#endif
         //Modern logical operators: &, |, !, !=
         if (c == '&') {
             if (n != ' ') line = line.insert(k, 1, ' ');

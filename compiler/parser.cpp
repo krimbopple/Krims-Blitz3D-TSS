@@ -123,7 +123,13 @@ void Parser::parseStmtSeq(StmtSeqNode* stmts, int scope, bool debug) {
 			std::string ident = toker->text();
 			toker->next(); std::string tag = parseTypeTag();
 			if (arrayDecls.find(ident) == arrayDecls.end()
-				&& toker->curr() != '=' && toker->curr() != '\\' && toker->curr() != '[') {
+				&& toker->curr() != '=' && toker->curr() != '\\' && toker->curr() != '['
+#ifdef XBETA
+				&& toker->curr() != PLUSEQ && toker->curr() != MINUSEQ
+				&& toker->curr() != STAREQ && toker->curr() != SLASHEQ
+				&& toker->curr() != AMPEQ
+#endif
+				) {
 				//must be a function
 				ExprSeqNode* exprs;
 				if (toker->curr() == '(') {
@@ -152,10 +158,8 @@ void Parser::parseStmtSeq(StmtSeqNode* stmts, int scope, bool debug) {
 			}
 			else {
 				//must be a var
-				std::unique_ptr<VarNode> var(parseVar(ident, tag));
-				if (toker->curr() != '=') exp(MultiLang::variable_assignment);
-				toker->next(); ExprNode* expr = parseExpr(false);
-				result = new AssNode(var.release(), expr);
+				VarNode* var = parseVar(ident, tag);
+				result = parseAssignment(var);
 			}
 		}
 		break;
@@ -418,10 +422,8 @@ void Parser::parseStmtSeq(StmtSeqNode* stmts, int scope, bool debug) {
 				DeclVarNode* tempNode = withStack.back();
 				VarExprNode* base = new VarExprNode(tempNode);
 				FieldVarNode* fvn = new FieldVarNode(base, fieldIdent, fieldTag);
-				if (toker->curr() == '=') {
-					toker->next();
-					ExprNode* rhs = parseExpr(false);
-					result = new AssNode(fvn, rhs);
+				if (toker->curr() == '=' || toker->curr() == PLUSEQ || toker->curr() == MINUSEQ || toker->curr() == STAREQ || toker->curr() == SLASHEQ || toker->curr() == AMPEQ) {
+					result = parseAssignment(fvn);
 				}
 				else {
 					result = new ExprStmtNode(new VarExprNode(fvn));
@@ -442,6 +444,34 @@ void Parser::parseStmtSeq(StmtSeqNode* stmts, int scope, bool debug) {
 			result->pos = pos;
 			stmts->push_back(result);
 		}
+	}
+}
+
+StmtNode* Parser::parseAssignment(VarNode* var) {
+	int opToken = toker->curr();
+	if (opToken == '=') {
+		toker->next();
+		ExprNode* rhs = parseExpr(false);
+		return new AssNode(var, rhs);
+	}
+#ifdef XBETA
+	else if (opToken == PLUSEQ || opToken == MINUSEQ || opToken == STAREQ || opToken == SLASHEQ || opToken == AMPEQ) {
+		int arithOp = 0;
+		switch (opToken) {
+		case PLUSEQ: arithOp = '+'; break;
+		case MINUSEQ: arithOp = '-'; break;
+		case STAREQ: arithOp = '*'; break;
+		case SLASHEQ: arithOp = '/'; break;
+		case AMPEQ: arithOp = '&'; break;
+		}
+		toker->next();
+		ExprNode* rhs = parseExpr(false);
+		return new CompoundAssNode(var, rhs, arithOp);
+	}
+#endif
+	else {
+		exp("assignment operator");
+		return nullptr;
 	}
 }
 

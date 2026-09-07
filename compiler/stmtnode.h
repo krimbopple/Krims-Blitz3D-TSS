@@ -262,6 +262,16 @@ struct WithNode : public StmtNode {
 	void translate(Codegen* g) override;
 };
 
+struct CompoundAssNode : public StmtNode {
+	VarNode* lhs;
+	ExprNode* rhs;
+	int op;
+	CompoundAssNode(VarNode* l, ExprNode* r, int o) : lhs(l), rhs(r), op(o) {}
+	~CompoundAssNode() { delete lhs; delete rhs; }
+	void semant(Environ* e) override;
+	void translate(Codegen* g) override;
+};
+
 #endif
 
 #endif

@@ -32,6 +32,7 @@ private:
 
 	StmtSeqNode* parseStmtSeq(int scope, bool debug);
 	void parseStmtSeq(StmtSeqNode* stmts, int scope, bool debug);
+	StmtNode* parseAssignment(VarNode* var);
 
 	void ex(const std::string& s);
 	void exp(const std::string& s);

@@ -690,4 +690,49 @@ void WithNode::translate(Codegen* g) {
 	stmts->translate(g);
 }
 
+void CompoundAssNode::semant(Environ* e) {
+	lhs->semant(e);
+	if (lhs->sem_type->constType()) ex("Cannot assign to constant");
+	rhs = rhs->semant(e);
+
+	Type* exprType = lhs->sem_type;
+	if (op == '&') {
+		exprType = Type::string_type;
+	}
+	else if (lhs->sem_type == Type::string_type) {
+		if (op != '+') ex("String only supports += and &=");
+		exprType = Type::string_type;
+	}
+	rhs = rhs->castTo(exprType, e);
+}
+
+void CompoundAssNode::translate(Codegen* g) {
+	TNode* load = lhs->load(g);
+	TNode* rNode = rhs->translate(g);
+
+	if (lhs->sem_type == Type::string_type) {
+		g->code(lhs->store(g, call("__bbStrConcat", load, rNode)));
+	}
+	else if (lhs->sem_type == Type::float_type) {
+		int opIR = 0;
+		switch (op) {
+		case '+': opIR = IR_FADD; break;
+		case '-': opIR = IR_FSUB; break;
+		case '*': opIR = IR_FMUL; break;
+		case '/': opIR = IR_FDIV; break;
+		}
+		g->code(lhs->store(g, new TNode(opIR, load, rNode)));
+	}
+	else {
+		int opIR = 0;
+		switch (op) {
+		case '+': opIR = IR_ADD; break;
+		case '-': opIR = IR_SUB; break;
+		case '*': opIR = IR_MUL; break;
+		case '/': opIR = IR_DIV; break;
+		}
+		g->code(lhs->store(g, new TNode(opIR, load, rNode)));
+	}
+}
+
 #endif
