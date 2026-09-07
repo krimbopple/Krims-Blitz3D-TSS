@@ -701,7 +701,7 @@ ExprNode* Parser::parseExpr2(bool opt) {
 		int c = toker->curr();
 		if (c != '<' && c != '>' && c != '=' && c != LE && c != GE && c != NE
 #ifdef XBETA
-			&& c != IS
+			&& c != IS && c != ISNOT
 #endif
 		) return lhs.release();
 
@@ -711,6 +711,10 @@ ExprNode* Parser::parseExpr2(bool opt) {
 #ifdef XBETA
 		if (c == IS) {
 			lhs = std::unique_ptr<ExprNode>(new RelExprNode('=', lhs.release(), rhs));
+			continue;
+		}
+		if (c == ISNOT) {
+			lhs = std::unique_ptr<ExprNode>(new RelExprNode(NE, lhs.release(), rhs));
 			continue;
 		}
 #endif

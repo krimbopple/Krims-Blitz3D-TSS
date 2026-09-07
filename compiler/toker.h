@@ -29,7 +29,7 @@ enum {
 #ifdef XBETA
 	DO, LOOP,
 	WITH, ENDWITH,
-	IS,
+	IS, ISNOT,
 #endif
 
 	BBNEW, BBDELETE, FIRST, LAST, INSERT, BEFORE, AFTER,
