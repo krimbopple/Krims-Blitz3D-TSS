@@ -699,8 +699,22 @@ ExprNode* Parser::parseExpr2(bool opt) {
 	if (!lhs) return 0;
 	for (;;) {
 		int c = toker->curr();
-		if (c != '<' && c != '>' && c != '=' && c != LE && c != GE && c != NE) return lhs.release();
-		toker->next(); ExprNode* rhs = parseExpr3(false);
+		if (c != '<' && c != '>' && c != '=' && c != LE && c != GE && c != NE
+#ifdef XBETA
+			&& c != IS
+#endif
+		) return lhs.release();
+
+		toker->next();
+		ExprNode* rhs = parseExpr3(false);
+		
+#ifdef XBETA
+		if (c == IS) {
+			lhs = std::unique_ptr<ExprNode>(new RelExprNode('=', lhs.release(), rhs));
+			continue;
+		}
+#endif
+		
 		lhs = std::unique_ptr<ExprNode>(new RelExprNode(c, lhs.release(), rhs));
 	}
 }

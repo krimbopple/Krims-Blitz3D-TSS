@@ -119,6 +119,7 @@ static void makeKeywords()
     alphaTokes["Loop"] = LOOP;
     alphaTokes["With"] = WITH;
     alphaTokes["End With"] = ENDWITH;
+    alphaTokes["Is"] = IS;
 #endif
 
     std::unordered_map<std::string, int>::const_iterator it;
