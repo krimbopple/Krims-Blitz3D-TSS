@@ -350,7 +350,9 @@ bool gxGraphics::changeDisplayMode(int width, int height, bool fullscreen, bool 
 }
 
 bool gxGraphics::setDarkMode(bool mode) {
+	if (!runtime) return false;
 	HWND hwnd = runtime->hwnd;
+	if (!hwnd || !IsWindow(hwnd)) return false;
 
 	BOOL DARK_MODE = mode ? TRUE : FALSE;
 	if (DwmSetWindowAttribute(hwnd, 20, &DARK_MODE, sizeof(DARK_MODE)) != S_OK) return false;
