@@ -122,6 +122,7 @@ static void makeKeywords()
     alphaTokes["Is"] = IS;
     alphaTokes["IsNot"] = ISNOT;
     alphaTokes["IsNaht"] = ISNOT;
+    alphaTokes["Case Else"] = DEFAULT;
 #endif
 
     std::unordered_map<std::string, int>::const_iterator it;
