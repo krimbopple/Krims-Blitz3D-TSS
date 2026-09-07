@@ -102,14 +102,16 @@ Need help, have a question, or found a problem?
 
 ## License
 
-Please read the license files before using, modifying, or distributing this
-project!!!
+Please read the applicable license files before using, modifying, or
+distributing this project.
 
-BlitzX3D contains code derived from Blitz3D. The original Blitz3D code remains
-licensed under the zlib/libpng License.
+BlitzX3D contains source code derived from the original Blitz3D project, as
+well as third-party components. Those portions remain licensed under their
+respective original licenses and are not relicensed by BlitzX3D.
 
-Original BlitzX3D contributions by Chris A. (krimbopple) are licensed under the
-BlitzX3D Community License.
+Original contributions to BlitzX3D by Chris A. (krimbopple) are licensed under
+the GNU General Public License, version 3 (GPLv3).
+
 
 ---
 
