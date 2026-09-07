@@ -234,4 +234,34 @@ struct RestoreNode : public StmtNode {
 	void translate(Codegen* g);
 };
 
+#ifdef XBETA
+
+struct DoLoopNode : public StmtNode {
+	ExprNode* cond;
+	StmtSeqNode* stmts;
+	bool topTested;
+	bool isUntil;
+	std::string sem_brk, sem_cont;
+
+	DoLoopNode(ExprNode* c, StmtSeqNode* s, bool top, bool until) : cond(c), stmts(s), topTested(top), isUntil(until) { }
+	~DoLoopNode() { delete cond; delete stmts; }
+
+	void semant(Environ* e) override;
+	void translate(Codegen* g) override;
+};
+
+struct WithNode : public StmtNode {
+	ExprNode* expr;
+	DeclVarNode* tempVar;
+	StmtSeqNode* stmts;
+
+	WithNode(ExprNode* e, DeclVarNode* tv, StmtSeqNode* s) : expr(e), tempVar(tv), stmts(s) { }
+	~WithNode() { delete expr; delete tempVar; delete stmts; }
+
+	void semant(Environ* e) override;
+	void translate(Codegen* g) override;
+};
+
+#endif
+
 #endif

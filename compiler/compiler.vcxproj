@@ -95,7 +95,7 @@
       <Optimization>MaxSpeed</Optimization>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <WarningLevel>TurnOffAllWarnings</WarningLevel>
-      <PreprocessorDefinitions>WIN32;NDEBUG;PRO;_LIB;_HAS_STD_BYTE=0;_NO_DEBUG_HEAP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;PRO;XBETA;_LIB;_HAS_STD_BYTE=0;_NO_DEBUG_HEAP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AssemblerListingLocation>.\Release\</AssemblerListingLocation>
       <PrecompiledHeaderOutputFile>.\Release\compiler.pch</PrecompiledHeaderOutputFile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>

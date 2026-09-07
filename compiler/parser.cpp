@@ -366,10 +366,72 @@ void Parser::parseStmtSeq(StmtSeqNode* stmts, int scope, bool debug) {
 				stmts->push_back(stmt);
 			} while (toker->curr() == ',');
 			break;
+#ifdef XBETA
+		case DO:
+		{
+			if (toker->next() == WHILE || toker->curr() == UNTIL) {
+				bool isUntil = (toker->curr() == UNTIL);
+				toker->next();
+				ExprNode* cond = parseExpr(false);
+				StmtSeqNode* body = parseStmtSeq(STMTS_BLOCK, debug);
+				if (toker->curr() != LOOP) exp("'Loop'");
+				toker->next();
+				result = new DoLoopNode(cond, body, true, isUntil);
+			}
+			else {
+				StmtSeqNode* body = parseStmtSeq(STMTS_BLOCK, debug);
+				if (toker->curr() != LOOP) exp("'Loop'");
+				toker->next();
+				bool isUntil = false;
+				ExprNode* cond = nullptr;
+				if (toker->curr() == WHILE || toker->curr() == UNTIL) {
+					isUntil = (toker->curr() == UNTIL);
+					toker->next();
+					cond = parseExpr(false);
+				}
+				result = new DoLoopNode(cond, body, false, isUntil);
+			}
+			break;
+		}
+
+		case WITH:
+		{
+			toker->next();
+			ExprNode* objExpr = parseExpr(false);
+			DeclVarNode* tempVar = new DeclVarNode();
+			withStack.push_back(tempVar);
+			StmtSeqNode* body = parseStmtSeq(STMTS_BLOCK, debug);
+			if (toker->curr() != ENDWITH) exp("'End With'");
+			toker->next();
+			withStack.pop_back();
+			result = new WithNode(objExpr, tempVar, body);
+			break;
+		}
+#endif
 		case '.':
 		{
-			toker->next(); std::string t = parseIdent();
+			toker->next();
+#ifdef XBETA
+			if (!withStack.empty()) {
+				std::string fieldIdent = parseIdent();
+				std::string fieldTag = parseTypeTag();
+				DeclVarNode* tempNode = withStack.back();
+				VarExprNode* base = new VarExprNode(tempNode);
+				FieldVarNode* fvn = new FieldVarNode(base, fieldIdent, fieldTag);
+				if (toker->curr() == '=') {
+					toker->next();
+					ExprNode* rhs = parseExpr(false);
+					result = new AssNode(fvn, rhs);
+				}
+				else {
+					result = new ExprStmtNode(new VarExprNode(fvn));
+				}
+				break;
+			}
+#endif
+			std::string t = parseIdent();
 			result = new LabelNode(t, datas->size());
+			break;
 		}
 		break;
 		default:
@@ -770,6 +832,18 @@ ExprNode* Parser::parsePrimary(bool opt) {
 	std::string t, ident, tag;
 	ExprNode* result = 0;
 	int n, k;
+
+#ifdef XBETA
+	if (toker->curr() == '.' && !withStack.empty()) {
+		toker->next();  // mmmm yummy .
+		std::string fieldIdent = parseIdent();
+		std::string fieldTag = parseTypeTag();
+		DeclVarNode* tempNode = withStack.back();
+		VarExprNode* base = new VarExprNode(tempNode);
+		FieldVarNode* fvn = new FieldVarNode(base, fieldIdent, fieldTag);
+		return new VarExprNode(fvn);
+	}
+#endif
 
 	switch (toker->curr()) {
 	case '(':

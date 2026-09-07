@@ -20,6 +20,9 @@ private:
 	std::set<std::string> included;
 	Toker* toker, * main_toker;
 	std::map<std::string, DimNode*> arrayDecls;
+#ifdef XBETA
+	std::vector<DeclVarNode*> withStack;
+#endif
 
 	DeclSeqNode* consts;
 	DeclSeqNode* structs;

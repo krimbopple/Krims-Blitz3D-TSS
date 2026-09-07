@@ -620,3 +620,74 @@ void ReadNode::translate(Codegen* g) {
 	else t = call("__bbReadStr");
 	g->code(var->store(g, t));
 }
+
+#ifdef XBETA
+
+void DoLoopNode::semant(Environ* e) {
+	if (cond) {
+		cond = cond->semant(e);
+		cond = cond->castTo(Type::int_type, e);
+	}
+	std::string brk = e->setBreak(sem_brk = genLabel());
+	std::string cont = e->setContinue(sem_cont = genLabel());
+	stmts->semant(e);
+	e->setBreak(brk);
+	e->setContinue(cont);
+}
+
+void DoLoopNode::translate(Codegen* g) {
+	std::string loop = genLabel();
+	if (topTested) {
+		// Do While/Until ... Loop
+		if (cond) {
+			std::string condLabel = genLabel();
+			g->label(sem_cont);
+			g->code(jump(condLabel));
+			g->label(loop);
+			stmts->translate(g);
+			g->label(condLabel);
+			if (isUntil)
+				g->code(jumpf(cond->translate(g), loop));
+			else
+				g->code(jumpt(cond->translate(g), loop));
+		}
+		else {
+			g->label(loop);
+			stmts->translate(g);
+			g->code(jump(loop));
+		}
+	}
+	else {
+		// Do ... Loop While/Until
+		g->label(sem_cont);
+		g->label(loop);
+		stmts->translate(g);
+		if (cond) {
+			if (isUntil)
+				g->code(jumpf(cond->translate(g), loop));
+			else
+				g->code(jumpt(cond->translate(g), loop));
+		}
+		else {
+			g->code(jump(loop));
+		}
+	}
+	g->label(sem_brk);
+}
+
+void WithNode::semant(Environ* e) {
+	expr = expr->semant(e);
+	std::string tempName = genLabel();
+	Decl* d = e->decls->insertDecl(tempName, expr->sem_type, DECL_LOCAL);
+	if (!d) ex("Internal error!! cannot create temporary for With");
+	tempVar->sem_decl = d;
+	tempVar->sem_type = expr->sem_type;
+	stmts->semant(e);
+}
+
+void WithNode::translate(Codegen* g) {
+	g->code(tempVar->store(g, expr->translate(g)));
+	stmts->translate(g);
+}
+
+#endif

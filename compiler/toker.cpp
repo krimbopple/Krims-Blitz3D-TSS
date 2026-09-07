@@ -114,6 +114,13 @@ static void makeKeywords()
     alphaTokes["End While"] = WEND;
 #endif
 
+#ifdef XBETA
+    alphaTokes["Do"] = DO;
+    alphaTokes["Loop"] = LOOP;
+    alphaTokes["With"] = WITH;
+    alphaTokes["End With"] = ENDWITH;
+#endif
+
     std::unordered_map<std::string, int>::const_iterator it;
     for (it = alphaTokes.begin(); it != alphaTokes.end(); ++it) {
         lowerTokes[tolower(it->first)] = it->second;
