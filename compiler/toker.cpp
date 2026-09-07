@@ -178,7 +178,39 @@ void Toker::nextline()
         return;
     }
 
-    getline(in, line); line += '\n';
+    std::string rawLine;
+    if (!getline(in, rawLine)) {
+        line = "\n";
+        tokes.push_back(Toke('\n', 0, 1));
+        return;
+    }
+
+#ifdef XBETA
+    while (true) {
+        size_t end = rawLine.find_last_not_of(" \t");
+        if (end != std::string::npos) {
+            rawLine.erase(end + 1);
+        }
+        else {
+            rawLine.clear();
+        }
+
+        if (rawLine.empty() || rawLine.back() != '_') {
+            break;
+        }
+
+        rawLine.pop_back();
+
+        std::string nextLine;
+        if (!getline(in, nextLine)) {
+            break;
+        }
+        ++curr_row;
+        rawLine += nextLine;
+    }
+#endif
+
+    line = rawLine + '\n';
     chars_toked += line.size();
 
     if (!noMacro) {
