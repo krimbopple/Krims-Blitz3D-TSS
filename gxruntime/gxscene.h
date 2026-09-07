@@ -7,6 +7,7 @@
 
 #include "gxlight.h"
 #include "gxeffect.h"
+#include "sdlgpu/sdl_gpu_scene.h"
 
 class gxCanvas;
 
@@ -161,6 +162,9 @@ private:
 	D3DXMATRIX currentWorld, currentView, currentProj;
 	float eyePos[3];
 
+	sdlgpu::GpuSceneFrame gpuFrame;
+	float gpuClearColor[3] = { 0, 0, 0 };
+
 	bool bumpNormalize = false;
 	float bumpUniformScale = 1.0f;
 
@@ -190,6 +194,7 @@ private:
 	void setTexState(int index, const TexState& state, bool set_blend);
 	void setEffectInternal(gxEffect* e);
 	void setSkinShaderConstants();
+	void computeGpuMVP(float out[16]) const;
 };
 
 #endif

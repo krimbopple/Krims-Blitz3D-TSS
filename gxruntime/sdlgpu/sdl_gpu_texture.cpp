@@ -63,4 +63,30 @@ void ReleaseTexture(SDL_GPUDevice* dev, SDL_GPUTexture* tex) {
 	SDL_ReleaseGPUTexture(dev, tex);
 }
 
+SDL_GPUTexture* CreateColorTarget(SDL_GPUDevice* dev, unsigned w, unsigned h) {
+	if (!dev || !w || !h) return nullptr;
+	SDL_GPUTextureCreateInfo info{};
+	info.type = SDL_GPU_TEXTURETYPE_2D;
+	info.format = SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM;
+	info.usage = SDL_GPU_TEXTUREUSAGE_COLOR_TARGET | SDL_GPU_TEXTUREUSAGE_SAMPLER;
+	info.width = w;
+	info.height = h;
+	info.layer_count_or_depth = 1;
+	info.num_levels = 1;
+	return SDL_CreateGPUTexture(dev, &info);
+}
+
+SDL_GPUTexture* CreateDepthTarget(SDL_GPUDevice* dev, unsigned w, unsigned h, int formatValue) {
+	if (!dev || !w || !h) return nullptr;
+	SDL_GPUTextureCreateInfo info{};
+	info.type = SDL_GPU_TEXTURETYPE_2D;
+	info.format = (SDL_GPUTextureFormat)formatValue;
+	info.usage = SDL_GPU_TEXTUREUSAGE_DEPTH_STENCIL_TARGET;
+	info.width = w;
+	info.height = h;
+	info.layer_count_or_depth = 1;
+	info.num_levels = 1;
+	return SDL_CreateGPUTexture(dev, &info);
+}
+
 }

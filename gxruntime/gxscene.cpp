@@ -3,6 +3,7 @@
 #include "gxgraphics.h"
 #include "gxruntime.h"
 #include "gxeffect.h"
+#include "gxmesh.h"
 
 static bool can_wb;
 static int  hw_tex_stages, tex_stages;
@@ -222,6 +223,9 @@ gxScene::gxScene(gxGraphics* g, gxCanvas* t) :
 
 gxScene::~gxScene() {
 	while(_allLights.size()) freeLight(*_allLights.begin());
+	if (graphics && graphics->runtime && graphics->runtime->sdlGpu) {
+		sdlgpu::ReleaseSceneTargets(graphics->runtime->sdlGpu, gpuFrame);
+	}
 }
 
 void gxScene::setEffect(gxEffect* e) {
@@ -807,6 +811,12 @@ bool gxScene::begin(const std::vector<gxLight*>& lights) {
 	setRS(D3DRS_FILLMODE, wireframe ? D3DFILL_WIREFRAME : D3DFILL_SOLID);
 	setRS(D3DRS_MULTISAMPLEANTIALIAS, antialias ? TRUE : FALSE);
 
+	if (graphics && graphics->runtime && graphics->runtime->sdlGpu) {
+		unsigned gw = (unsigned)viewport.Width;
+		unsigned gh = (unsigned)viewport.Height;
+		sdlgpu::BeginSceneFrame(gpuFrame, graphics->runtime->sdlGpu, gw, gh, gpuClearColor[0], gpuClearColor[1], gpuClearColor[2]);
+	}
+
 	return true;
 }
 
@@ -815,9 +825,20 @@ void gxScene::clear(const float rgb[3], float alpha, float z, bool clear_argb, b
 	int flags = (clear_argb ? D3DCLEAR_TARGET : 0) | (clear_z ? D3DCLEAR_ZBUFFER : 0);
 	unsigned argb = (int(alpha * 255.0f) << 24) | (int(rgb[0] * 255.0f) << 16) | (int(rgb[1] * 255.0f) << 8) | int(rgb[2] * 255.0f);
 	dir3dDev->Clear(0, 0, flags, argb, z, 0);
+	if (clear_argb) {
+		gpuClearColor[0] = rgb[0];
+		gpuClearColor[1] = rgb[1];
+		gpuClearColor[2] = rgb[2];
+	}
 }
 
 void gxScene::render(gxMesh* mesh, int first_vert, int vert_cnt, int first_tri, int tri_cnt) {
+	if (gpuFrame.active() && mesh && !mesh->isSkinned() && mesh->getGpuMirror()) {
+		float mvp[16];
+		computeGpuMVP(mvp);
+		sdlgpu::RenderSceneMesh(gpuFrame, mesh->getGpuMirror(), mvp, nullptr, first_vert, vert_cnt, first_tri, tri_cnt);
+	}
+
 	if (currentEffect) {
 		UINT passes;
 		if (currentEffect->begin(&passes)) {
@@ -873,6 +894,14 @@ void gxScene::render(gxMesh* mesh, int first_vert, int vert_cnt, int first_tri, 
 	setRS(D3DRS_LIGHTING, true);
 	if(tex_stages > 1) setTexState(1, texstate[1], true);
 	setTexState(0, texstate[0], true);
+}
+
+void gxScene::computeGpuMVP(float out[16]) const {
+	D3DXMATRIX mvp;
+	D3DXMatrixMultiply(&mvp, &currentWorld, &currentView);
+	D3DXMatrixMultiply(&mvp, &mvp, &currentProj);
+	D3DXMatrixTranspose(&mvp, &mvp);
+	memcpy(out, &mvp, 64);
 }
 
 void gxScene::setSkinShaderConstants() {
@@ -955,6 +984,7 @@ void gxScene::end() {
 	dir3dDev->EndScene();
 	RECT r = { (LONG)viewport.X, (LONG)viewport.Y, (LONG)(viewport.X + viewport.Width), (LONG)(viewport.Y + viewport.Height) };
 	target->damage(r);
+	sdlgpu::EndSceneFrame(gpuFrame);
 }
 
 gxLight* gxScene::createLight(int flags) {
