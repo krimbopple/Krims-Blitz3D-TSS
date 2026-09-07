@@ -534,7 +534,12 @@ void Toker::nextline()
         }
         if (isalpha(c))
         {
-            for (++k; isalnum(line[k]) || line[k] == '_'; ++k) {}
+            for (++k; isalnum(line[k]) || line[k] == '_'
+#ifdef XBETA
+                || line[k] == '\''
+#endif
+                ; ++k) {
+            }
 
             std::string ident = tolower(line.substr(from, k - from));
 
