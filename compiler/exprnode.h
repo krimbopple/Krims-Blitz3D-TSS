@@ -61,6 +61,18 @@ struct CallPtrNode : public ExprNode {
 	TNode* translate(Codegen* g);
 };
 
+#ifdef XBETA
+struct CallIndirectNode : public ExprNode {
+	ExprNode* funcExpr;
+	ExprSeqNode* exprs;
+	FuncPtrType* sem_fptype;
+	CallIndirectNode(ExprNode* f, ExprSeqNode* e) :funcExpr(f), exprs(e), sem_fptype(nullptr) {}
+	~CallIndirectNode() { delete funcExpr; delete exprs; }
+	ExprNode* semant(Environ* e);
+	TNode* translate(Codegen* g);
+};
+#endif
+
 struct VarExprNode : public ExprNode {
 	VarNode* var;
 	VarExprNode(VarNode* v) :var(v) {}

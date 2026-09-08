@@ -22,6 +22,7 @@ private:
 	std::map<std::string, DimNode*> arrayDecls;
 #ifdef XBETA
 	std::vector<DeclVarNode*> withStack;
+	std::map<std::string, bool> funcPtrIdents;
 #endif
 
 	DeclSeqNode* consts;
@@ -50,6 +51,10 @@ private:
 	DeclNode* parseFuncDecl(bool debug);
 	DeclNode* parseStructDecl();
 	DeclNode* parseEnumDecl();
+
+#ifdef XBETA
+	std::vector<std::string>* parseFuncPtrParamTags();
+#endif
 
 	ExprSeqNode* parseExprSeq();
 

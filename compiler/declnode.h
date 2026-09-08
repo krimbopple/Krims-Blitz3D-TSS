@@ -37,8 +37,21 @@ struct VarDeclNode : public DeclNode {
 	int kind; bool constant;
 	ExprNode* expr;
 	DeclVarNode* sem_var;
-	VarDeclNode(const std::string& i, const std::string& t, int k, bool c, ExprNode* e) :ident(i), tag(t), kind(k), constant(c), expr(e), sem_var(0) {}
-	~VarDeclNode() { delete expr; delete sem_var; }
+#ifdef XBETA
+	std::vector<std::string>* funcPtrParamTags;
+#endif
+	VarDeclNode(const std::string& i, const std::string& t, int k, bool c, ExprNode* e)
+		:ident(i), tag(t), kind(k), constant(c), expr(e), sem_var(0)
+#ifdef XBETA
+		, funcPtrParamTags(0)
+#endif
+	{}
+	~VarDeclNode() {
+		delete expr; delete sem_var;
+#ifdef XBETA
+		delete funcPtrParamTags;
+#endif
+	}
 	void proto(DeclSeq* d, Environ* e);
 	void semant(Environ* e);
 	void translate(Codegen* g);

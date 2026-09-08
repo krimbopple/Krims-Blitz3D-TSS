@@ -122,12 +122,17 @@ void Parser::parseStmtSeq(StmtSeqNode* stmts, int scope, bool debug) {
 		{
 			std::string ident = toker->text();
 			toker->next(); std::string tag = parseTypeTag();
+#ifdef XBETA
+			bool isFuncPtrCall = funcPtrIdents.count(ident) != 0 && toker->curr() == '('
+				&& arrayDecls.find(ident) == arrayDecls.end();
+#endif
 			if (arrayDecls.find(ident) == arrayDecls.end()
 				&& toker->curr() != '=' && toker->curr() != '\\' && toker->curr() != '['
 #ifdef XBETA
 				&& toker->curr() != PLUSEQ && toker->curr() != MINUSEQ
 				&& toker->curr() != STAREQ && toker->curr() != SLASHEQ
 				&& toker->curr() != AMPEQ
+				&& !isFuncPtrCall
 #endif
 				) {
 				//must be a function
@@ -156,6 +161,18 @@ void Parser::parseStmtSeq(StmtSeqNode* stmts, int scope, bool debug) {
 				}
 				else { result = 0; }
 			}
+#ifdef XBETA
+			else if (isFuncPtrCall) {
+				toker->next();
+				std::unique_ptr<ExprSeqNode> exprs(parseExprSeq());
+				if (toker->curr() != ')') exp("')'");
+				toker->next();
+				VarNode* var = new IdentVarNode(ident, tag);
+				ExprNode* funcExpr = new VarExprNode(var);
+				CallIndirectNode* call = new CallIndirectNode(funcExpr, exprs.release());
+				result = new ExprStmtNode(call);
+			}
+#endif
 			else {
 				//must be a var
 				VarNode* var = parseVar(ident, tag);
@@ -486,6 +503,34 @@ std::string Parser::parseTypeTag() {
 	return "";
 }
 
+#ifdef XBETA
+std::vector<std::string>* Parser::parseFuncPtrParamTags() {
+	if (toker->curr() != '(') return 0;
+	toker->next();
+	std::unique_ptr<std::vector<std::string>> tags(new std::vector<std::string>());
+	if (toker->curr() != ')') {
+		for (;;) {
+			std::string t;
+			switch (toker->curr()) {
+			case BBINT: t = "%"; toker->next(); break;
+			case BBFLOAT: t = "#"; toker->next(); break;
+			case BBSTR: t = "$"; toker->next(); break;
+			case OBJECT: t = "@"; toker->next(); break;
+			default:
+				t = parseTypeTag();
+				if (!t.size()) t = "%";
+			}
+			tags->push_back(t);
+			if (toker->curr() != ',') break;
+			toker->next();
+		}
+		if (toker->curr() != ')') exp("')'");
+	}
+	toker->next();
+	return tags.release();
+}
+#endif
+
 VarNode* Parser::parseVar() {
 	std::string ident = parseIdent();
 	std::string tag = parseTypeTag();
@@ -531,6 +576,22 @@ DeclNode* Parser::parseVarDecl(int kind, bool constant) {
 	std::string ident = parseIdent();
 	std::string tag = parseTypeTag();
 	DeclNode* d;
+#ifdef XBETA
+	if ((tag == "%" || tag == "#" || tag == "$" || tag == "@") && toker->curr() == '(') {
+		std::vector<std::string>* paramTags = parseFuncPtrParamTags();
+		ExprNode* expr = 0;
+		if (toker->curr() == '=') {
+			toker->next(); expr = parseExpr(false);
+		}
+		else if (constant) ex(MultiLang::constants_must_initialized);
+		VarDeclNode* vd = new VarDeclNode(ident, tag, kind, constant, expr);
+		vd->funcPtrParamTags = paramTags;
+		funcPtrIdents[ident] = true;
+		d = vd;
+		d->pos = pos; d->file = incfile;
+		return d;
+	}
+#endif
 	if (toker->curr() == '[') {
 		if (constant) ex(MultiLang::blitz_arrays_may_not_be_constant);
 		toker->next();
@@ -957,6 +1018,18 @@ ExprNode* Parser::parsePrimary(bool opt) {
 	case IDENT:
 		ident = toker->text();
 		toker->next(); tag = parseTypeTag();
+#ifdef XBETA
+		if (funcPtrIdents.count(ident) && toker->curr() == '(' && arrayDecls.find(ident) == arrayDecls.end()) {
+			toker->next();
+			std::unique_ptr<ExprSeqNode> exprs(parseExprSeq());
+			if (toker->curr() != ')') exp("')'");
+			toker->next();
+			VarNode* var = new IdentVarNode(ident, tag);
+			ExprNode* funcExpr = new VarExprNode(var);
+			result = new CallIndirectNode(funcExpr, exprs.release());
+			break;
+		}
+#endif
 		if (toker->curr() == '(' && arrayDecls.find(ident) == arrayDecls.end()) {
 			//must be a func
 			toker->next();

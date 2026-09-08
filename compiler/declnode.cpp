@@ -54,7 +54,38 @@ void DeclSeqNode::transdata(Codegen* g) {
 ////////////////////////////
 void VarDeclNode::proto(DeclSeq* d, Environ* e) {
 
-    Type* ty = tagType(tag, e);
+    Type* ty;
+
+#ifdef XBETA
+    if (funcPtrParamTags) {
+        Type* retTy = tagType(tag, e);
+        if (!retTy) retTy = Type::int_type;
+        std::vector<Type*> paramTypes;
+        for (size_t k = 0; k < funcPtrParamTags->size(); ++k) {
+            Type* pty = tagType((*funcPtrParamTags)[k], e);
+            if (!pty) pty = Type::int_type;
+            paramTypes.push_back(pty);
+        }
+        FuncPtrType* fpt = new FuncPtrType(retTy, paramTypes);
+        e->types.push_back(fpt);
+        ty = fpt;
+
+        if (expr) {
+            expr = expr->semant(e);
+            expr = expr->castTo(ty, e);
+            if (constant || (kind & DECL_PARAM)) {
+                ex(MultiLang::expression_must_be_constant);
+            }
+        }
+
+        Decl* decl = d->insertDecl(ident, ty, kind, 0);
+        if (!decl) ex(MultiLang::duplicate_variable_name);
+        if (expr) sem_var = new DeclVarNode(decl);
+        return;
+    }
+#endif
+
+    ty = tagType(tag, e);
     if (!ty) ty = Type::int_type;
     ConstType* defType = 0;
 

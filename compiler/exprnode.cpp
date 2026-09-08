@@ -204,13 +204,56 @@ ExprNode* CallPtrNode::semant(Environ* env) {
 	
 	if (!sem_decl || !(sem_decl->kind & DECL_FUNC)) ex(std::format(MultiLang::function_not_found, ident));
 	if (OverrideFunctionMap.contains(ident)) ex(MultiLang::ambiguous_function_reference);
+
+#ifdef XBETA
+	FuncType* f = sem_decl->type->funcType();
+	std::vector<Type*> paramTypes;
+	for(int k = 0; k < f->params->size(); ++k) {
+		paramTypes.push_back(f->params->decls[k]->type);
+	}
+	sem_type = new FuncPtrType(f->returnType, paramTypes);
+#else
 	sem_type = Type::pointer_type;
+#endif
 	return this;
 }
 
 TNode* CallPtrNode::translate(Codegen* g) {
 	return global("_f" + ident);
 }
+
+#ifdef XBETA
+////////////////////////////////
+// Call through function ptr  //
+////////////////////////////////
+ExprNode* CallIndirectNode::semant(Environ* e) {
+	funcExpr = funcExpr->semant(e);
+	sem_fptype = funcExpr->sem_type->funcPtrType();
+	if(!sem_fptype) ex("'" + funcExpr->sem_type->name() + "' is not a function pointer and cannot be called");
+
+	if(exprs->size() > (int)sem_fptype->paramTypes.size()) ex(MultiLang::too_many_parameters);
+	if(exprs->size() < (int)sem_fptype->paramTypes.size()) ex(MultiLang::not_enough_parameters);
+
+	exprs->semant(e);
+	for(int k = 0; k < exprs->size(); ++k) {
+		exprs->exprs[k] = exprs->exprs[k]->castTo(sem_fptype->paramTypes[k], e);
+	}
+
+	sem_type = sem_fptype->returnType;
+	return this;
+}
+
+TNode* CallIndirectNode::translate(Codegen* g) {
+
+	TNode* l = funcExpr->translate(g);
+	TNode* r = exprs->translate(g, false);
+
+	if(sem_type == Type::float_type) {
+		return new TNode(IR_FCALL, l, r, exprs->size() * 4);
+	}
+	return new TNode(IR_CALL, l, r, exprs->size() * 4);
+}
+#endif
 
 /////////////////////////
 // Variable expression //

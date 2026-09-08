@@ -8,6 +8,9 @@ struct ArrayType;
 struct StructType;
 struct ConstType;
 struct VectorType;
+#ifdef XBETA
+struct FuncPtrType;
+#endif
 
 struct Type {
 	virtual ~Type() {}
@@ -24,6 +27,9 @@ struct Type {
 	virtual StructType* structType() { return 0; }
 	virtual ConstType* constType() { return 0; }
 	virtual VectorType* vectorType() { return 0; }
+#ifdef XBETA
+	virtual FuncPtrType* funcPtrType() { return 0; }
+#endif
 
 	//operators
 	virtual bool canCastTo(Type* t) { return this == t; }
@@ -82,5 +88,52 @@ struct VectorType : public Type {
 	virtual bool canCastTo(Type* t);
 	std::string name() { return elementType->name() + " vector"; }
 };
+
+#ifdef XBETA
+struct FuncPtrType : public Type {
+	Type* returnType;
+	std::vector<Type*> paramTypes;
+
+	FuncPtrType(Type* r, const std::vector<Type*>& p) :returnType(r), paramTypes(p) {}
+
+	FuncPtrType* funcPtrType() { return this; }
+
+	bool matches(FuncType* f) const {
+		if(!f) return false;
+		if(f->returnType != returnType) return false;
+		if(f->params->size() != (int)paramTypes.size()) return false;
+		for(int k = 0; k < (int)paramTypes.size(); ++k) {
+			if(f->params->decls[k]->type != paramTypes[k]) return false;
+		}
+		return true;
+	}
+
+	bool sameShape(FuncPtrType* t) const {
+		if(!t) return false;
+		if(t->returnType != returnType) return false;
+		if(t->paramTypes.size() != paramTypes.size()) return false;
+		for(int k = 0; k < (int)paramTypes.size(); ++k) {
+			if(t->paramTypes[k] != paramTypes[k]) return false;
+		}
+		return true;
+	}
+
+	bool canCastTo(Type* t) override {
+		if(t == this) return true;
+		if(FuncPtrType* f = t->funcPtrType()) return sameShape(f);
+		return t == Type::int_type || t == Type::pointer_type;
+	}
+
+	std::string name() {
+		std::string s = returnType->name() + " function pointer(";
+		for(size_t k = 0; k < paramTypes.size(); ++k) {
+			if(k) s += ", ";
+			s += paramTypes[k]->name();
+		}
+		s += ")";
+		return s;
+	}
+};
+#endif
 
 #endif
